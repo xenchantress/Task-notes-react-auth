@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
@@ -7,21 +8,44 @@ import Register from "./pages/Register";
 import Notes from "./pages/Notes";
 import Note from "./pages/Note";
 import Users from "./pages/Users";
-import { clear } from "@testing-library/user-event/dist/clear";
+import UserContext from './context/UserContext';
+import jwt_decode from 'jwt-decode';
 
+
+const checkToken = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    const decode = jwt_decode(token);
+    const currentTime = Date.now() / 1000;
+    if (decode.exp < currentTime) {
+      localStorage.removeItem("token");
+      return false;
+    }
+    return true;
+  }
+  return false;
+};
 function App() {
+  const [user, setUser] = useState(false);
+
+  useEffect(() => {
+    setUser(checkToken());
+  }, []);
+
   return (
-    <div className="App font-mono ">
-      <Navbar />
-      <Routes>
-        <Route path="/" Component={Home} />
-        <Route path="/notes" Component={Notes} />
-        <Route path="/notes/:noteId" Component={Note} />
-        <Route path="/login" Component={Login} />
-        <Route path="/register" Component={Register} />
-        <Route path="/users" Component={Users} />
-      </Routes>
-    </div>
+    <UserContext.Provider value={[user, setUser]}>
+      <div className="App font-mono">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/notes/:noteId" element={<Note />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/users" element={<Users />} />
+        </Routes>
+      </div>
+    </UserContext.Provider>
   );
 }
 
