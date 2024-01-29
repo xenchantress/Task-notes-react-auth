@@ -44,6 +44,8 @@ const register = async (userInfo) => {
 
     storeToken(response.data.token);
     console.log('Registration successful:', response.data);
+    window.location.href = '/src/login';
+
     return response.data;
   } catch (error) {
     console.error('Registration failed:', error.response.data);

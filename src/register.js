@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
 import authApi from '../api/auth';
+import { useHistory } from 'react-router-dom';
+
 
 const Register = () => {
+  const history = useHistory();
     const [userInfo, setUserInfo] = useState({
         username: '',
     password: '',
     picture: '',
 });
 
-const registerMutation = useMutation(authApi.register);
+const registerMutation = useMutation(authApi.register,{
+onSuccess: () => {
+  console.log('Registration successful');
+  history.push('/login');
+},
+});
 
 const handleFormSubmit = async (e) => {
   e.preventDefault();
 
   try {
     await registerMutation.mutateAsync(userInfo);
-    console.log('Registration successful');
+    //console.log('Registration successful');
   } catch (error) {
     console.error('Registration failed:', error);
   }
